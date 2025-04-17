@@ -1,39 +1,29 @@
-// Create Web Server 
-// Import express
+// Create web server
 const express = require('express');
-// Import fs
-const fs = require('fs');
-// Create express app
+const cors = require('cors');
+const bodyParser = require('body-parser');
 const app = express();
-// Use json parser middleware
-app.use(express.json());
+const port = 3000;
 
-// Read data from comments.json file
-let comments = JSON.parse(fs.readFileSync('comments.json', 'utf8'));
+// Middleware
+app.use(cors());
+app.use(bodyParser.json());
 
-// GET /comments - Return all comments
+// In-memory database
+let comments = [];
+
+// Routes
 app.get('/comments', (req, res) => {
   res.json(comments);
 });
 
-// POST /comments - Create a new comment
 app.post('/comments', (req, res) => {
-  const newComment = req.body;
-  comments.push(newComment);
-  fs.writeFileSync('comments.json', JSON.stringify(comments, null, 2));
-  res.status(201).json(newComment);
+  const comment = req.body;
+  comments.push(comment);
+  res.status(201).json(comment);
 });
 
-// DELETE /comments/:id - Delete a comment by ID
-app.delete('/comments/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  comments = comments.filter(comment => comment.id !== id);
-  fs.writeFileSync('comments.json', JSON.stringify(comments, null, 2));
-  res.status(204).send();
-});
-
-// Start the server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+// Start server
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
 });
